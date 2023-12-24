@@ -41,6 +41,7 @@ const std::string idPrefix[] = {
     "FTL::WearLeveling::StaticWearLeveling",
     "FIL",
     "FIL::PALOLD",
+    "ML",
 };
 
 const std::string logPrefix[] = {

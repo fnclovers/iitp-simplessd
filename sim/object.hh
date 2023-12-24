@@ -60,6 +60,10 @@ namespace SimpleSSD {
 #define info(format, ...)
 #endif
 
+namespace ML {
+class CoReadPredictor;
+}
+
 /**
  * \brief Common data for Object
  *
@@ -75,9 +79,17 @@ struct ObjectData {
   ConfigReader *config;
   Log *log;
 
-  ObjectData() : cpu(nullptr), memory(nullptr), config(nullptr), log(nullptr) {}
+  /* ML */
+  ML::CoReadPredictor *predictor;
+
+  ObjectData()
+      : cpu(nullptr),
+        memory(nullptr),
+        config(nullptr),
+        log(nullptr),
+        predictor(nullptr) {}
   ObjectData(CPU::CPU *e, Memory::System *s, ConfigReader *c, Log *l)
-      : cpu(e), memory(s), config(c), log(l) {}
+      : cpu(e), memory(s), config(c), log(l), predictor(nullptr) {}
 };
 
 /**

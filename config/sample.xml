@@ -12,6 +12,16 @@
   Attribute name is case-sensitive.
  -->
 <simplessd version="2.1-unknown">
+  <section name="sim">
+    <!--
+      <str> File path of ML model
+    -->
+    <config name="MLFilePath">/root/parallelism_workspace/traces/ml/web</config>
+    <!--
+      <int:u64> Latency of ML model
+    -->
+    <config name="ModelLatency">1000</config>
+  </section>
   <!--
     Rule of values
 

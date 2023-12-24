@@ -17,6 +17,7 @@
 #include "ftl/gc/naive.hh"
 #include "ftl/gc/preemption.hh"
 #include "ftl/mapping/page_level_mapping.hh"
+#include "ftl/ml-prediction/interface/predictor.hh"
 #include "ftl/read_reclaim/basic_read_reclaim.hh"
 #include "ftl/wear_leveling/static_wear_leveling.hh"
 #include "icl/icl.hh"
@@ -219,6 +220,11 @@ void FTL::completeRequest(Request *req) {
 void FTL::read(Request &&req) {
   auto preq = insertRequest(std::move(req));
 
+  if (preq->getLPN() == preq->getSLPN()) {
+    object.predictor->enqueueNewRequest(true, preq->getTag(), preq->getSLPN(),
+                                        preq->getNLP());
+  }
+
   debugprint(Log::DebugID::FTL, "READ  | LPN %" PRIu64, preq->lpn);
 
   ftlobject.pFTL->read(preq);
@@ -226,6 +232,10 @@ void FTL::read(Request &&req) {
 
 void FTL::write(Request &&req) {
   auto preq = insertRequest(std::move(req));
+
+  if (preq->getLPN() == preq->getSLPN())
+    object.predictor->enqueueNewRequest(false, preq->getTag(), preq->getSLPN(),
+                                        preq->getNLP());
 
   debugprint(Log::DebugID::FTL, "WRITE | LPN %" PRIu64, preq->lpn);
 
