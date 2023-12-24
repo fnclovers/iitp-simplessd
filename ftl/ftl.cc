@@ -149,6 +149,8 @@ FTL::FTL(ObjectData &o) : Object(o), ftlobject(), requestCounter(0) {
 
       break;
   }
+
+  object.predictor->init(ftlobject.pMapping->getInfo()->totalLogicalPages);
 }
 
 FTL::~FTL() {
@@ -211,7 +213,7 @@ Request *FTL::getRequest(uint64_t tag) {
 
 void FTL::completeRequest(Request *req) {
   scheduleNow(req->event, req->data);
-
+  object.predictor->dequeueNewRequest(req->getTag());
   auto iter = requestQueue.find(req->tag);
 
   requestQueue.erase(iter);

@@ -9,6 +9,10 @@
 
 #include <iostream>
 
+#include "ftl/ml-prediction/interface/predictor.hh"
+#include "ftl/ml-prediction/interface/predictor_impl.hh"
+#include "ftl/ml-prediction/interface/training_impl.hh"
+#include "ftl/ml-prediction/interface/workload_monitor.hh"
 #include "hil/none/subsystem.hh"
 #include "hil/nvme/subsystem.hh"
 #include "mem/system.hh"
@@ -140,6 +144,7 @@ bool SimpleSSD::init(Engine *e, ConfigReader *c) noexcept {
   log.init(object.cpu, outfile, errfile, debugfile);
 
   object.memory = new Memory::System(&object);
+  object.predictor = new ML::CoReadPredictor(&object);
 
   // Initialize objects
   switch (mode) {

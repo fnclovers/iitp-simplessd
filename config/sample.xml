@@ -16,7 +16,7 @@
     <!--
       <str> File path of ML model
     -->
-    <config name="MLFilePath">/root/parallelism_workspace/traces/ml/web</config>
+    <config name="MLFilePath">/root/parallelism_workspace/SimpleSSD-Standalone/mlp_model.bin</config>
     <!--
       <int:u64> Latency of ML model
     -->
