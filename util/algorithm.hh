@@ -79,6 +79,7 @@ inline uint64_t ctz64(uint64_t val) {
 
 #else  // _MSC_VER
 
+#define UNUSED(x) (void)(x)
 #define LIKELY(x) __builtin_expect(!!(x), 1)
 #define UNLIKELY(x) __builtin_expect(!!(x), 0)
 

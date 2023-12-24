@@ -307,6 +307,7 @@ class Log {
     FTL_StaticWearLeveling,
     FIL,
     FIL_PALOLD,
+    ML,
   };
 
   enum class LogID : uint32_t {

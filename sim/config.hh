@@ -31,6 +31,7 @@ class Config : public BaseConfig {
     DebugFile,
     Controller,
     RestoreFromCheckpoint,
+    ModelLatency,
   };
 
   enum class Mode : uint8_t {
@@ -47,6 +48,7 @@ class Config : public BaseConfig {
   std::string debugFile;
   Mode mode;
   bool restore;
+  uint64_t modelLatency;
 
  public:
   Config();
