@@ -159,6 +159,7 @@ class Request {
   friend CopyContext;
 
   uint64_t tag;
+  uint64_t mltag;
 
   // Current request information (Invalid when Trim/Format)
   LPN lpn;  //!< Requested LPN or stored LPN in spare area
@@ -187,6 +188,9 @@ class Request {
 
   inline uint64_t getTag() { return tag; }
   inline void setTag(uint64_t t) { tag = t; }
+
+  inline uint64_t getMLTag() { return mltag; }
+  inline void setMLTag(uint64_t t) { mltag = t; }
 
   inline Operation getOperation() { return opcode; }
   inline Response getResponse() { return result; }

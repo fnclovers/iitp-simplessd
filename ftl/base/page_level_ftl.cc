@@ -11,6 +11,11 @@
 #include "ftl/background_manager/abstract_job_manager.hh"
 #include "ftl/gc/abstract_gc.hh"
 #include "ftl/mapping/abstract_mapping.hh"
+#include "ftl/ml-prediction/interface/predictor.hh"
+#include "ftl/ml-prediction/interface/predictor_impl.hh"
+#include "ftl/ml-prediction/interface/training_impl.hh"
+#include "ftl/ml-prediction/interface/workload_monitor.hh"
+#include "ftl/predictor_interface.hh"
 
 namespace SimpleSSD::FTL {
 
@@ -60,6 +65,10 @@ PageLevelFTL::PageLevelFTL(ObjectData &o, FTLObjectData &fo, FTL *p,
 
   mergeReadModifyWrite = readConfigBoolean(Section::FlashTranslation,
                                            Config::Key::MergeReadModifyWrite);
+
+  eventPollPrediction =
+      createEvent([this](uint64_t t, uint64_t d) { poll_prediction(t, d); },
+                  "ML::eventPollPrediction");
 }
 
 PageLevelFTL::~PageLevelFTL() {}
@@ -87,9 +96,25 @@ PageLevelFTL::getRMWContext(uint64_t tag) {
   return iter;
 }
 
+void PageLevelFTL::poll_prediction(uint64_t t, uint64_t d) {
+  UNUSED(t);
+  Request *cmd = (Request *)d;
+  ML::CoReadPrediction prediction;
+
+  if (object.predictor->tryGetPrediction(cmd->getMLTag(), prediction)) {
+    ftlobject.pJobManager->triggerByUser(TriggerType::ReadMapping, cmd);
+    ftlobject.pMapping->readMapping(cmd, eventReadSubmit);
+  }
+  else {
+    // Prediction not ready, so try again
+    scheduleRel(eventPollPrediction, (uint64_t)cmd, 1000000);
+  }
+}
+
 void PageLevelFTL::read(Request *cmd) {
-  ftlobject.pJobManager->triggerByUser(TriggerType::ReadMapping, cmd);
-  ftlobject.pMapping->readMapping(cmd, eventReadSubmit);
+  uint64_t t = object.predictor->startPrediction(cmd->getLPN());
+  cmd->setMLTag(t);
+  scheduleNow(eventPollPrediction, (uint64_t)cmd);
 }
 
 void PageLevelFTL::read_submit(uint64_t tag) {

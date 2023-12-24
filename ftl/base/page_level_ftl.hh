@@ -70,6 +70,9 @@ class PageLevelFTL : public AbstractFTL {
     uint64_t rmwWrittenPages;  // Written pages in RMW
   } stat;
 
+  Event eventPollPrediction;
+  void poll_prediction(uint64_t, uint64_t);
+
   Event eventReadSubmit;
   void read_submit(uint64_t);
 
