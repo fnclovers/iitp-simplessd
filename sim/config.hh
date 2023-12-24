@@ -32,6 +32,7 @@ class Config : public BaseConfig {
     Controller,
     RestoreFromCheckpoint,
     ModelLatency,
+    MLFilePath,
   };
 
   enum class Mode : uint8_t {
@@ -49,6 +50,7 @@ class Config : public BaseConfig {
   Mode mode;
   bool restore;
   uint64_t modelLatency;
+  std::string mlFilePath;
 
  public:
   Config();

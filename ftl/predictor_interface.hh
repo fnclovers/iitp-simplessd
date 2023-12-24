@@ -18,10 +18,8 @@ struct CoReadPrediction {
 
   bool hit;
 
-  CoReadPrediction()
-      : targetLPN(UINT64_MAX), interval(0), hit(false) {}
-  CoReadPrediction(LPN l)
-      : targetLPN(l), interval(0), hit(false) {}
+  CoReadPrediction() : targetLPN(UINT64_MAX), interval(0), hit(false) {}
+  CoReadPrediction(LPN l) : targetLPN(l), interval(0), hit(false) {}
 };
 
 // Entry for idle time prediction
@@ -35,8 +33,9 @@ struct WindowEntry {
   std::vector<Entry> entries;
   LPN slpn;
   uint32_t nlp;
+  uint64_t issued;
 
-  WindowEntry(LPN l, uint32_t n) : slpn(l), nlp(n) {}
+  WindowEntry(LPN l, uint32_t n, uint64_t i) : slpn(l), nlp(n), issued(i) {}
 };
 
 class CoReadPredictor;

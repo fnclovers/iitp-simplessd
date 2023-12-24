@@ -10,27 +10,27 @@ cmake_minimum_required(VERSION 3.10)
 project(simplessd)
 
 # Validate build type
-if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
   set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Select CMake build type." FORCE)
 
   set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release")
-endif ()
+endif()
 
-string (TOUPPER "${CMAKE_BUILD_TYPE}" uppercase_CMAKE_BUILD_TYPE)
+string(TOUPPER "${CMAKE_BUILD_TYPE}" uppercase_CMAKE_BUILD_TYPE)
 
-if (CMAKE_BUILD_TYPE AND NOT uppercase_CMAKE_BUILD_TYPE MATCHES "^(DEBUG|RELEASE)$")
-  message (FATAL_ERROR "Invalid value for CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
-endif ()
+if(CMAKE_BUILD_TYPE AND NOT uppercase_CMAKE_BUILD_TYPE MATCHES "^(DEBUG|RELEASE)$")
+  message(FATAL_ERROR "Invalid value for CMAKE_BUILD_TYPE: ${CMAKE_BUILD_TYPE}")
+endif()
 
 # Validate build path
 # https://github.com/llvm/llvm-project/blob/master/llvm/CMakeLists.txt#L249
-if (CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR AND NOT MSVC)
+if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR AND NOT MSVC)
   message(FATAL_ERROR "In-source builds are not allowed.
 Please create a directory and run cmake from there, passing the path
 to this source directory as the last argument.
 This process created the file `CMakeCache.txt' and the directory `CMakeFiles'.
 Please delete them.")
-endif ()
+endif()
 
 # Set cache entry for external library include path
 set(DRAMPOWER_SOURCE_DIR "." CACHE PATH "Source directory to DRAMPower library")
@@ -51,34 +51,34 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 
 # Check DRAMPOWER_SOURCE_DIR is valid
-if (NOT EXISTS "${DRAMPOWER_SOURCE_DIR}/libdrampower/LibDRAMPower.h")
+if(NOT EXISTS "${DRAMPOWER_SOURCE_DIR}/libdrampower/LibDRAMPower.h")
   message(FATAL_ERROR "Failed to find DRAMPower library. \
 Check you specified DRAMPower path by -DDRAMPOWER_SOURCE_DIR.")
-endif ()
+endif()
 
 # Check mcpat is valid
-if (NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/mcpat/mcpat.h")
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/mcpat/mcpat.h")
   message(FATAL_ERROR "Failed to find McPAT library. \
 Check you initialized submodules.")
-endif ()
+endif()
 
 # Check pugixml is valid
-if (NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/pugixml/src/pugixml.hpp")
-message(FATAL_ERROR "Failed to find pugixml library. \
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/pugixml/src/pugixml.hpp")
+  message(FATAL_ERROR "Failed to find pugixml library. \
 Check you initialized submodules.")
-endif ()
+endif()
 
 # Check cache2 is valid
-if (NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/catch2/include/catch.hpp")
-message(FATAL_ERROR "Failed to find catch2 library. \
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/catch2/include/catch.hpp")
+  message(FATAL_ERROR "Failed to find catch2 library. \
 Check you initialized submodules.")
-endif ()
+endif()
 
 # Check json is valid
-if (NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/json/include/nlohmann/json.hpp")
-message(FATAL_ERROR "Failed to find nlohmann json c++ library. \
+if(NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/json/include/nlohmann/json.hpp")
+  message(FATAL_ERROR "Failed to find nlohmann json c++ library. \
 Check you initialized submodules.")
-endif ()
+endif()
 
 # Add subproject
 add_subdirectory(${PROJECT_SOURCE_DIR}/lib/mcpat)
@@ -195,6 +195,9 @@ set(SRC_FTL
   ftl/filling.cc
   ftl/ftl.cc
   ftl/predictor_interface.cc
+  ftl/ml-prediction/interface/predictor_impl.cc
+  ftl/ml-prediction/interface/training_impl.cc
+  ftl/ml-prediction/interface/workload_monitor.cc
 )
 set(SRC_FTL_ALLOC
   ftl/allocator/abstract_allocator.cc
@@ -322,25 +325,25 @@ set(SRCS_EXCLUDE
   ${OUTPUT_VERSION_FILE}
 )
 
-if (MSVC AND FW_LATENCY)
+if(MSVC AND FW_LATENCY)
   message(WARNING "Automatic firmware latency generation is not tested on Windows")
-endif ()
+endif()
 
-if (FW_LATENCY)
-  if (uppercase_CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+if(FW_LATENCY)
+  if(uppercase_CMAKE_BUILD_TYPE STREQUAL "DEBUG")
     message(STATUS "Force release build")
     set(uppercase_CMAKE_BUILD_TYPE "RELEASE")
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Force release build" FORCE)
-  endif ()
+  endif()
 
   # Check llvm-simplessd is valid
-  if (NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/llvm-simplessd/CMakeLists.txt")
+  if(NOT EXISTS "${PROJECT_SOURCE_DIR}/lib/llvm-simplessd/CMakeLists.txt")
     message(FATAL_ERROR "Failed to find llvm-simplessd library. \
     Check you initialized submodules.")
-  endif ()
+  endif()
 
   # Detects CROSS_COMPILE
-  if (NOT "${FW_CROSS_COMPILE}" STREQUAL "")
+  if(NOT "${FW_CROSS_COMPILE}" STREQUAL "")
     message("-- Detecting include path from ${FW_CROSS_COMPILE}g++")
 
     # Get include paths
@@ -350,9 +353,9 @@ if (FW_LATENCY)
       OUTPUT_QUIET
     )
 
-    if (NOT ${FW_CROSS_RESULT} EQUAL 0)
+    if(NOT ${FW_CROSS_RESULT} EQUAL 0)
       message(FATAL_ERROR "Command failed with error code: ${FW_CROSS_RESULT}")
-    endif ()
+    endif()
 
     # Parse
     string(REPLACE "\n" ";" FW_CROSS_OUTPUT ${FW_CROSS_OUTPUT})
@@ -360,29 +363,29 @@ if (FW_LATENCY)
     set(GOOD 0)
     set(FW_INCLUDE "")
 
-    foreach (LINE IN ITEMS ${FW_CROSS_OUTPUT})
-      if ("${LINE}" STREQUAL "End of search list.")
+    foreach(LINE IN ITEMS ${FW_CROSS_OUTPUT})
+      if("${LINE}" STREQUAL "End of search list.")
         set(GOOD 0)
-      endif ()
+      endif()
 
-      if (${GOOD} EQUAL 1)
+      if(${GOOD} EQUAL 1)
         string(STRIP "${LINE}" LINE)
         list(APPEND FW_INCLUDE "-I${LINE}")
-      endif ()
+      endif()
 
-      if ("${LINE}" STREQUAL "#include <...> search starts here:")
+      if("${LINE}" STREQUAL "#include <...> search starts here:")
         set(GOOD 1)
-      endif ()
-    endforeach ()
+      endif()
+    endforeach()
 
-    if ("${FW_TARGET}" STREQUAL "")
+    if("${FW_TARGET}" STREQUAL "")
       message(FATAL_ERROR "You need to specify FW_TARGET if you use FW_CROSS_COMPILE")
-    endif ()
+    endif()
 
-    if ("${FW_CPU}" STREQUAL "")
+    if("${FW_CPU}" STREQUAL "")
       message(FATAL_ERROR "You need to specify FW_CPU if you use FW_CROSS_COMPILE")
-    endif ()
-  endif ()
+    endif()
+  endif()
 
   # Make OBJS list
   set(BUILD_DIRECTORY "${PROJECT_BINARY_DIR}/objects")
@@ -417,20 +420,20 @@ if (FW_LATENCY)
     "-DEXCLUDE_CPU"
   )
 
-  if (NOT "${FW_TARGET}" STREQUAL "")
+  if(NOT "${FW_TARGET}" STREQUAL "")
     string(FIND ${FW_TARGET} "-" FW_TARGET_POS)
     string(SUBSTRING ${FW_TARGET} 0 ${FW_TARGET_POS} FW_ARCH)
 
     list(APPEND FW_FIRST_PASS_ARGS "--target=${FW_TARGET}")
     list(APPEND FW_FIRST_PASS_ARGS "-m${FW_ARCH}")
-  endif ()
+  endif()
 
-  if (NOT "${FW_CPU}" STREQUAL "")
+  if(NOT "${FW_CPU}" STREQUAL "")
     set(FW_CPU_ARG "-mcpu=${FW_CPU}")
     list(APPEND FW_FIRST_PASS_ARGS "${FW_CPU_ARG}")
-  endif ()
+  endif()
 
-  foreach (IDX RANGE ${SRC_LEN})
+  foreach(IDX RANGE ${SRC_LEN})
     list(GET SRCS ${IDX} SRC)
     list(GET OBJS ${IDX} OBJ)
 
@@ -449,7 +452,7 @@ if (FW_LATENCY)
       WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
       COMMENT "Instrumenting file ${SRC}"
     )
-  endforeach ()
+  endforeach()
 
   # CMake should run custom commands to create simplessd-objects
   add_custom_target(build-objects ALL
@@ -465,9 +468,9 @@ if (FW_LATENCY)
   # Make dependency
   add_dependencies(build-objects llvm-simplessd)
   add_dependencies(simplessd build-objects)
-else ()
+else()
   add_library(simplessd STATIC ${SRCS} ${SRCS_EXCLUDE})
-endif ()
+endif()
 
 # Configure test
 set(SRC_TEST
@@ -482,11 +485,11 @@ add_executable(test_simplessd ${SRC_TEST})
 target_compile_definitions(simplessd PRIVATE -DUSE_WRITE_THROUGH=1)
 
 # Platform specific settings
-if (MSVC)
+if(MSVC)
   target_compile_definitions(simplessd PRIVATE -D_CRT_SECURE_NO_WARNINGS)
-  target_compile_options(simplessd PRIVATE /wd4819)  # Surpress unicode warning
-else ()
-  if (USE_SANITIZER)
+  target_compile_options(simplessd PRIVATE /wd4819) # Surpress unicode warning
+else()
+  if(USE_SANITIZER)
     set(SANFLAG
       -fsanitize=address
       -fsanitize=undefined
@@ -496,9 +499,9 @@ else ()
       -fno-sanitize=null
       -fno-sanitize=alignment
     )
-  else ()
+  else()
     set(SANFLAG "")
-  endif ()
+  endif()
 
   target_compile_options(simplessd PRIVATE -g -Wall -Wextra -Werror -Wno-attributes ${SANFLAG})
 
@@ -507,16 +510,16 @@ else ()
   target_link_libraries(simplessd stdc++fs ${SANFLAG})
   target_link_libraries(test_simplessd stdc++fs)
 
-  if (uppercase_CMAKE_BUILD_TYPE STREQUAL "DEBUG")
-    message (STATUS "Using debug build")
+  if(uppercase_CMAKE_BUILD_TYPE STREQUAL "DEBUG")
+    message(STATUS "Using debug build")
 
     target_compile_definitions(simplessd PRIVATE -DSIMPLESSD_DEBUG)
-  endif ()
+  endif()
 
-  if (FW_LATENCY)
+  if(FW_LATENCY)
     target_compile_definitions(simplessd PRIVATE -DFW_LATENCY=1)
-  endif ()
-endif ()
+  endif()
+endif()
 
 # Force version checking in every build
 add_dependencies(simplessd ${VERSION_TARGET})

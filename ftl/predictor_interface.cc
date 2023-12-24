@@ -5,6 +5,10 @@
 #include <vector>
 
 #include "cpu/cpu.hh"
+#include "ftl/ml-prediction/interface/predictor.hh"
+#include "ftl/ml-prediction/interface/predictor_impl.hh"
+#include "ftl/ml-prediction/interface/training_impl.hh"
+#include "ftl/ml-prediction/interface/workload_monitor.hh"
 #include "sim/config.hh"
 #include "sim/object.hh"
 
@@ -97,14 +101,11 @@ void AbstractMLModel::cancelTraining(LPN) {
 }
 
 void AbstractMLModel::storePrediction(uint64_t tag, CoReadPrediction &&pred) {
-  UNUSED(tag);
-  UNUSED(pred);
-  // TODO: store prediction for inference
+  pPredictor->predictionBuf.emplace(tag, std::move(pred));
 }
 
 void AbstractMLModel::storeHistory(WindowEntry &window) {
-  UNUSED(window);
-  // TODO: store history for training
+  pPredictor->pTable->add(window);
 }
 
 }  // namespace SimpleSSD::ML
