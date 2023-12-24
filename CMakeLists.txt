@@ -526,6 +526,11 @@ endif()
 # Force version checking in every build
 add_dependencies(simplessd ${VERSION_TARGET})
 
+set(CMAKE_PREFIX_PATH "/root/parallelism_workspace/SimpleSSD-Standalone/libtorch")
+find_package(Torch REQUIRED)
+
+target_link_libraries(simplessd "${TORCH_LIBRARIES}")
+
 target_link_libraries(simplessd mcpat pugixml nlohmann_json::nlohmann_json)
 target_link_libraries(test_simplessd simplessd Catch2::Catch2)
 
