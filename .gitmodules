@@ -13,3 +13,6 @@
 [submodule "lib/json"]
 	path = lib/json
 	url = git@github.com:ArthurSonzogni/nlohmann_json_cmake_fetchcontent.git
+[submodule "ftl/ml-prediction"]
+	path = ftl/ml-prediction
+	url = git@github.com:fnclovers/iitp-ml.git
