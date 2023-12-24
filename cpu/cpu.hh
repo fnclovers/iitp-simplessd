@@ -40,6 +40,7 @@ enum class CPUGroup {
   HostInterface,          //!< Assign function to HIL core
   InternalCache,          //!< Assign function to ICL core
   FlashTranslationLayer,  //!< Assign function to FTL core
+  ML,                     //!< Assign function to ML core
   Any,                    //!< Assign function to most-idle core
 };
 
@@ -60,6 +61,7 @@ class Function {
 
  public:
   Function();
+  Function(uint64_t cycles);
   Function(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t,
            uint64_t);
 
@@ -167,6 +169,7 @@ class CPU {
   uint16_t hilCore;
   uint16_t iclCore;
   uint16_t ftlCore;
+  uint16_t mlCore;
 
   std::vector<Core> coreList;
   std::vector<Event> eventList;
@@ -267,6 +270,7 @@ class CPU {
    * \param[in] eid Event ID to deschedule
    */
   void deschedule(Event eid) noexcept;
+  void deschedule(Event eid, uint64_t data) noexcept;
 
   /**
    * \brief Check event is scheduled

@@ -20,6 +20,15 @@ Function::Function()
       otherInsts(0),
       cycles(0) {}
 
+Function::Function(uint64_t c)
+    : branch(0),
+      load(0),
+      store(0),
+      arithmetic(0),
+      floatingPoint(0),
+      otherInsts(0),
+      cycles(c) {}
+
 Function::Function(uint64_t b, uint64_t l, uint64_t s, uint64_t a, uint64_t f,
                    uint64_t o, uint64_t c)
     : branch(b),
@@ -185,8 +194,9 @@ CPU::CPU(Engine *e, ConfigReader *c, Log *l)
   hilCore = (uint16_t)config->readUint(Section::CPU, Config::Key::HILCore);
   iclCore = (uint16_t)config->readUint(Section::CPU, Config::Key::ICLCore);
   ftlCore = (uint16_t)config->readUint(Section::CPU, Config::Key::FTLCore);
+  mlCore = 1;
 
-  uint16_t totalCore = hilCore + iclCore + ftlCore;
+  uint16_t totalCore = hilCore + iclCore + ftlCore + mlCore;
 
   coreList.resize(totalCore);
 
@@ -229,7 +239,7 @@ void CPU::calculatePower(Power &power) {
   // Print stats before die
   ParseXML param;
   uint64_t simCycle = (getTick() - lastResetStat) / clockPeriod;
-  uint32_t totalCore = hilCore + iclCore + ftlCore;
+  uint32_t totalCore = hilCore + iclCore + ftlCore + mlCore;
   uint32_t coreIdx = 0;
 
   param.initialize();
@@ -644,9 +654,13 @@ void CPU::schedule(CPUGroup group, Event eid, uint64_t data,
       break;
     case CPUGroup::FlashTranslationLayer:
       begin = hilCore + iclCore;
+      end = hilCore + iclCore + ftlCore;
+      break;
+    case CPUGroup::ML:
+      begin = hilCore + iclCore + ftlCore;
       [[fallthrough]];
     case CPUGroup::Any:
-      end = hilCore + iclCore + ftlCore;
+      end = hilCore + iclCore + ftlCore + mlCore;
       break;
   }
 
@@ -700,6 +714,25 @@ void CPU::deschedule(Event eid) noexcept {
   }
 }
 
+void CPU::deschedule(Event eid, uint64_t data) noexcept {
+  eid->deschedule();
+
+  for (auto iter = jobQueue.begin(); iter != jobQueue.end(); ++iter) {
+    if (iter->second.eid == eid && iter->second.data == data) {
+      if (UNLIKELY(iter == dispatchPointer)) {
+        // We are erasing next dispatch item, update iterator correctly
+        dispatchPointer = jobQueue.erase(iter);
+      }
+      else {
+        // Just remove it
+        jobQueue.erase(iter);
+      }
+
+      break;
+    }
+  }
+}
+
 bool CPU::isScheduled(Event eid) noexcept {
   return eid->isScheduled();
 }
@@ -708,10 +741,11 @@ void CPU::destroyEvent(Event) noexcept {
   panic_log("Not allowed to destroy event");
 }
 
+#ifdef ENABLE_CPU_STAT
 void CPU::getStatList(std::vector<Stat> &list, std::string prefix) noexcept {
   std::string number;
   std::string prefix2;
-  uint32_t totalCore = hilCore + iclCore + ftlCore;
+  uint32_t totalCore = hilCore + iclCore + ftlCore + mlCore;
   uint32_t ncore = 0;
 
   if (useDedicatedCore) {
@@ -769,6 +803,10 @@ void CPU::getStatValues(std::vector<double> &values) noexcept {
     values.push_back((double)inst.otherInsts);
   }
 }
+#else
+void CPU::getStatList(std::vector<Stat> &, std::string) noexcept {}
+void CPU::getStatValues(std::vector<double> &) noexcept {}
+#endif
 
 void CPU::resetStatValues() noexcept {
   lastResetStat = getTick();
@@ -787,6 +825,7 @@ void CPU::createCheckpoint(std::ostream &out) const noexcept {
   BACKUP_SCALAR(out, hilCore);
   BACKUP_SCALAR(out, iclCore);
   BACKUP_SCALAR(out, ftlCore);
+  BACKUP_SCALAR(out, mlCore);
 
   BACKUP_STL(out, eventList, iter, BACKUP_SCALAR(out, iter));
 
@@ -822,6 +861,11 @@ void CPU::restoreCheckpoint(std::istream &in) noexcept {
   RESTORE_SCALAR(in, tmp16);
   if (tmp16 != ftlCore) {
     panic_log("FTL Core count mismatch.");
+  }
+
+  RESTORE_SCALAR(in, tmp16);
+  if (tmp16 != mlCore) {
+    panic_log("ML Core count mismatch.");
   }
 
   uint64_t size;
