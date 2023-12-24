@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: GPL-3.0-or-later
+/*
+ * Copyright (C) 2019 CAMELab
+ *
+ * Author: Donghyun Gouk <kukdh1@camelab.org>
+ */
+
+#include "sim/version.hh"
+
+namespace SimpleSSD {
+
+const char SIMPLESSD_VERSION[] = "@VERSION_STRING@";
+
+}

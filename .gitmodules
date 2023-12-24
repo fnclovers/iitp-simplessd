@@ -1,0 +1,15 @@
+[submodule "lib/pugixml"]
+	path = lib/pugixml
+	url = git@github.com:zeux/pugixml
+[submodule "lib/mcpat"]
+	path = lib/mcpat
+	url = git@camel.kaist.ac.kr:simplessd/mcpat
+[submodule "lib/llvm-simplessd"]
+	path = lib/llvm-simplessd
+	url = git@camel.kaist.ac.kr:simplessd/llvm-simplessd
+[submodule "lib/catch2"]
+	path = lib/catch2
+	url = git@github.com:catchorg/Catch2.git
+[submodule "lib/json"]
+	path = lib/json
+	url = git@github.com:ArthurSonzogni/nlohmann_json_cmake_fetchcontent.git
