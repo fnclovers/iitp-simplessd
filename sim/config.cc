@@ -17,6 +17,7 @@ const char NAME_ERROR_FILE[] = "ErrorFile";
 const char NAME_DEBUG_FILE[] = "DebugFile";
 const char NAME_CONTROLLER[] = "Controller";
 const char NAME_ML_MODEL_LATENCY[] = "ModelLatency";
+const char NAME_ML_TRAINING_LATENCY[] = "TrainingLatency";
 const char NAME_ML_FILE_PATH[] = "MLFilePath";
 
 //! A constructor
@@ -28,6 +29,7 @@ Config::Config() {
   mode = Mode::None;
   restore = false;
   modelLatency = 1000;
+  trainingLatency = 1000;
   mlFilePath = "";
 }
 
@@ -39,6 +41,7 @@ void Config::loadFrom(pugi::xml_node &section) noexcept {
     LOAD_NAME_STRING(node, NAME_DEBUG_FILE, debugFile);
     LOAD_NAME_UINT_TYPE(node, NAME_CONTROLLER, Mode, mode);
     LOAD_NAME_UINT(node, NAME_ML_MODEL_LATENCY, modelLatency);
+    LOAD_NAME_UINT(node, NAME_ML_MODEL_LATENCY, trainingLatency);
     LOAD_NAME_STRING(node, NAME_ML_FILE_PATH, mlFilePath);
   }
 }
@@ -51,6 +54,7 @@ void Config::storeTo(pugi::xml_node &section) noexcept {
   STORE_NAME_STRING(section, NAME_DEBUG_FILE, debugFile);
   STORE_NAME_UINT(section, NAME_CONTROLLER, mode);
   STORE_NAME_UINT(section, NAME_ML_MODEL_LATENCY, modelLatency);
+  STORE_NAME_UINT(section, NAME_ML_MODEL_LATENCY, trainingLatency);
   STORE_NAME_STRING(section, NAME_ML_FILE_PATH, mlFilePath);
 }
 
@@ -60,6 +64,8 @@ uint64_t Config::readUint(uint32_t idx) const noexcept {
       return (uint64_t)mode;
     case ModelLatency:
       return modelLatency;
+    case TrainingLatency:
+      return trainingLatency;
   }
 
   return 0;
@@ -100,6 +106,9 @@ bool Config::writeUint(uint32_t idx, uint64_t value) noexcept {
       break;
     case ModelLatency:
       modelLatency = value;
+      break;
+    case TrainingLatency:
+      trainingLatency = value;
       break;
     default:
       ret = false;

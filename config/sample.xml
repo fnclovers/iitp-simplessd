@@ -21,6 +21,10 @@
       <int:u64> Latency of ML model
     -->
     <config name="ModelLatency">1000</config>
+    <!--
+      <int:u64> Training latency of ML model
+    -->
+    <config name="TrainingLatency">1000</config>
   </section>
   <!--
     Rule of values

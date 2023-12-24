@@ -32,6 +32,7 @@ class Config : public BaseConfig {
     Controller,
     RestoreFromCheckpoint,
     ModelLatency,
+    TrainingLatency,
     MLFilePath,
   };
 
@@ -50,6 +51,7 @@ class Config : public BaseConfig {
   Mode mode;
   bool restore;
   uint64_t modelLatency;
+  uint64_t trainingLatency;
   std::string mlFilePath;
 
  public:

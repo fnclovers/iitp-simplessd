@@ -15,9 +15,11 @@
 namespace SimpleSSD::ML {
 
 AbstractMLModel::AbstractMLModel(ObjectData &o)
-    : Object(o), trainingFstat(1), trainingCnt(0), BGDepth(0), UserDepth(0) {
+    : Object(o), trainingCnt(0), BGDepth(0), UserDepth(0) {
   inferenceFstat = readConfigUint(SimpleSSD::Section::Simulation,
                                   SimpleSSD::Config::Key::ModelLatency);
+  trainingFstat = readConfigUint(SimpleSSD::Section::Simulation,
+                                 SimpleSSD::Config::Key::TrainingLatency);
   eventInferenceDone = createEvent(
       [this](uint64_t t, uint64_t d) {
         UNUSED(t);

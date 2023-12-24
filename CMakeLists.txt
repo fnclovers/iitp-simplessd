@@ -199,6 +199,7 @@ set(SRC_FTL
   ftl/ml-prediction/interface/training_impl.cc
   ftl/ml-prediction/interface/predictor.cc
   ftl/ml-prediction/interface/workload_monitor.cc
+  ftl/ml-prediction/interface/mlp_model.cc
 )
 set(SRC_FTL_ALLOC
   ftl/allocator/abstract_allocator.cc
